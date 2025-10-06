@@ -10,6 +10,10 @@ Route::get('/login', function () {
     return view('login');
 });
 
+Route::get('/customizer', function () {
+    return view('customizer');
+});
+
 Route::get('/no-beta-for-you-yet', function () {
     return view('no-beta');
 });

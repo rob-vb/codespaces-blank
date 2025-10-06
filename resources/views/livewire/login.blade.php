@@ -49,8 +49,8 @@
                     />
                 </label>
             </div>
-{{ $test }}
-            <button class="btn btn-primary w-full mt-4" wire:click="up">Sign in</button>
+
+            <button class="btn btn-primary w-full mt-4" wire:click="signIn">Sign in</button>
 
             <div class="mt-2 text-center text-xs">
                 Forgot your password? Reset on <a class="text-accent" href="https://cfgi.io/recover-password" target="_blank">CFGI</a>.
