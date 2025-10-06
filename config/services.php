@@ -34,5 +34,8 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'remote_api' => [
+        'base_url' => env('REMOTE_API_BASE_URL', 'https://cfgi.io'),
+    ],
 
 ];
