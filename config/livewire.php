@@ -157,5 +157,5 @@ return [
     */
 
     'pagination_theme' => 'tailwind',
-    'asset_url' => app()->environment('local') ? env('ASSET_URL') : null,
+    'asset_url' => config('app.env') === 'local' ? env('ASSET_URL') : null,
 ];
