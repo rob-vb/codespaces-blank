@@ -157,5 +157,5 @@ return [
     */
 
     'pagination_theme' => 'tailwind',
-    // 'asset_url' => env('ASSET_URL' , 'http://localhost') . '/vendor/livewire/livewire.min.js',
+    'asset_url' => app()->environment('local') ? env('ASSET_URL') : null,
 ];
