@@ -55,6 +55,7 @@ class Login extends Component
         return redirect()->route('customizer');
     }
     
+    
     public function render()
     {
         return view('livewire.login');
