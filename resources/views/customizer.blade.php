@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div class="tabs tabs-box sticky top-0 z-99 -ml-4 -mr-4 px-4 shadow-none">
+    <div class="tabs tabs-box sticky top-0 z-99 -ml-4 -mr-4 px-4 shadow-none js-customizer-tabs">
         <input type="radio" name="tabs" class="tab" aria-label="Portfolio" data-id="portfolio" checked="checked" />
         <input type="radio" name="tabs" class="tab" aria-label="Timeframes" data-id="timeframes" />
         <input type="radio" name="tabs" class="tab" aria-label="Currencies" data-id="currencies" />

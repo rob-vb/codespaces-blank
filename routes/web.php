@@ -8,6 +8,7 @@ Route::middleware('api.auth')->group(function () {
     Route::get('/', fn() => view('test'))->name('home');
     Route::get('/customizer', fn() => view('customizer'))->name('customizer');
     Route::get('/no-beta-for-you-yet', fn() => view('no-beta'))->name('no-beta');
+    Route::get('/profiles', fn() => view('profiles'))->name('profiles');
 });
 
 Route::get('/logout', function () {
