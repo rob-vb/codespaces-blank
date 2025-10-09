@@ -75,7 +75,7 @@ class Portfolio extends Component
 
         try {
             $response = Http::remote()->post(
-                '/api/v2/profile/sizing/?profile_id=' . $this->activeProfileId,
+                '/api/v2/profile/sizing/' . $this->activeProfileId,
                 $payload
             );
 
@@ -228,7 +228,7 @@ class Portfolio extends Component
         }
 
         $defaultSizing = $this->fetchCollection('/api/v2/default-sizing/');
-        $userSizing = $this->fetchCollection('/api/v2/profile/sizing/?profile_id=' . $this->activeProfileId);
+        $userSizing = $this->fetchCollection('/api/v2/profile/sizing/' . $this->activeProfileId);
 
         return $this->prepareSizingData($defaultSizing, $userSizing);
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -11,7 +12,16 @@ use Throwable;
 
 class Profiles extends Component
 {
-    public array $profiles;
+    public array $profiles = [];
+    public ?int $editingProfileId = null;
+    public string $editingLabel = '';
+    public string $originalEditingLabel = '';
+    public array $statusUpdates = [];
+
+    public function mount(): void
+    {
+        $this->profiles = $this->getProfiles();
+    }
 
     private function getProfiles(): array
     {
@@ -27,10 +37,119 @@ class Profiles extends Component
         }
     }
 
+    private function findProfileIndex(int $profileId): ?int
+    {
+        foreach ($this->profiles as $index => $profile) {
+            if ((int) ($profile['id'] ?? 0) === $profileId) {
+                return $index;
+            }
+        }
+
+        return null;
+    }
+
     #[On('update-profiles')]
     public function updateProfiles(): void
     {
         $this->profiles = $this->getProfiles();
+    }
+
+    public function setProfileStatus(int $profileId, bool $isActive): void
+    {
+        $index = $this->findProfileIndex($profileId);
+
+        if ($index === null) {
+            return;
+        }
+
+        $profile = $this->profiles[$index];
+
+        if (Str::lower((string) ($profile['trade_mode'] ?? '')) !== 'live') {
+            return;
+        }
+
+        $previousStatus = (string) ($profile['status'] ?? 'INACTIVE');
+        $nextStatus = $isActive ? 'ACTIVE' : 'INACTIVE';
+
+        $this->profiles[$index]['status'] = $nextStatus;
+        $this->statusUpdates[$profileId] = true;
+
+        try {
+            $response = Http::remote()->post('/api/v2/profile/status/', [
+                'profile_id' => $profileId,
+                'status' => $nextStatus,
+            ]);
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->profiles[$index]['status'] = $previousStatus;
+            unset($this->statusUpdates[$profileId]);
+            $this->addError("status.{$profileId}", 'Unable to update profile status. Please try again.');
+
+            return;
+        }
+
+        if ($response->failed()) {
+            $this->profiles[$index]['status'] = $previousStatus;
+            unset($this->statusUpdates[$profileId]);
+
+            $message = (string) ($response->json('error') ?? 'Unable to update profile status. Please try again.');
+            $this->addError("status.{$profileId}", $message);
+
+            return;
+        }
+
+        unset($this->statusUpdates[$profileId]);
+        $this->resetErrorBag("status.{$profileId}");
+    }
+
+    public function startEditing(int $profileId): void
+    {
+        $index = $this->findProfileIndex($profileId);
+
+        if ($index === null) {
+            return;
+        }
+
+        $label = (string) ($this->profiles[$index]['label'] ?? '');
+        $resolvedLabel = filled($label) ? $label : sprintf('Profile #%d', $profileId);
+
+        $this->editingProfileId = $profileId;
+        $this->editingLabel = $resolvedLabel;
+        $this->originalEditingLabel = $resolvedLabel;
+        $this->resetErrorBag('label');
+    }
+
+    public function cancelEditing(): void
+    {
+        $this->editingProfileId = null;
+        $this->editingLabel = '';
+        $this->originalEditingLabel = '';
+        $this->resetErrorBag('label');
+    }
+
+    public function saveEditingLabel(): void
+    {
+        if ($this->editingProfileId === null) {
+            return;
+        }
+
+        $profileId = $this->editingProfileId;
+        $normalizedLabel = trim($this->editingLabel);
+        $originalLabel = trim($this->originalEditingLabel);
+
+        if ($normalizedLabel === '') {
+            return;
+        }
+
+        if ($normalizedLabel === $originalLabel) {
+            $this->cancelEditing();
+
+            return;
+        }
+
+        $this->editingLabel = $normalizedLabel;
+        $this->updateProfileLabel($profileId, $normalizedLabel);
+        $this->cancelEditing();
     }
 
     public function updateProfileLabel(int $profileId, string $label): void
@@ -122,8 +241,6 @@ class Profiles extends Component
 
     public function render()
     {
-        $this->profiles = $this->getProfiles();
-
         return view('livewire.profiles', [
             'profiles' => $this->profiles,
         ]);

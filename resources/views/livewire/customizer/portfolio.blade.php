@@ -1,4 +1,4 @@
-<div class="card bg-base-100 mt-2 shadow-sm js-customizer-tab" id="portfolio">
+<div class="card bg-base-100 mt-2 shadow-sm">
     <div class="card-body">
         <div class="flex items-center card-title mb-4 text-gray-800">
             <span>Portfolio Management System</span>

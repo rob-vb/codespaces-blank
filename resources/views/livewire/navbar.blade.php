@@ -1,7 +1,7 @@
 <div class="navbar flex justify-between bg-base-100 shadow-sm">
     <div class="flex items-center">
         <img class="w-6 h-6" src="{{ asset('/images/nmst.png') }}" alt="NMST" />
-        <span class="ml-2 font-bold text-gray-800">Beta v0.3</span>
+        <span class="ml-2 font-bold text-gray-800">Beta v0.4</span>
     </div>
 
     @if($this->isLoggedIn())

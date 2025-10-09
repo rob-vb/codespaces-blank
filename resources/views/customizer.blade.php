@@ -15,8 +15,16 @@
         <input type="radio" name="tabs" class="tab" aria-label="Currencies" data-id="currencies" />
     </div>
 
-    <livewire:customizer.portfolio />
-    <livewire:customizer.timeframes />
-    <livewire:customizer.currencies />
+    <div class="js-customizer-tab" id="portfolio">
+        <livewire:customizer.portfolio />
+    </div>
+
+    <div class="card bg-base-100 mt-2 shadow-sm hidden js-customizer-tab" id="timeframes">
+        <livewire:customizer.timeframes />
+    </div>
+
+    <div class="card bg-base-100 mt-2 shadow-sm hidden js-customizer-tab" id="currencies">
+        <livewire:customizer.currencies />
+    </div>
 </div>
 @endsection
