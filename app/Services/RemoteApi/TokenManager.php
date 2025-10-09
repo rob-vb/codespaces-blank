@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\RemoteApi;
 
+use App\Services\ActiveProfileManager;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Client\Factory as HttpFactory;
@@ -18,6 +19,7 @@ class TokenManager
 
     public function __construct(
         private readonly HttpFactory $http,
+        private readonly ActiveProfileManager $activeProfileManager,
     ) {
     }
 
@@ -170,6 +172,8 @@ class TokenManager
             'api.refresh_token_expires_at',
             'api.user',
         ]);
+
+        $this->activeProfileManager->clearActiveProfile();
     }
 
     public function getToken(): ?string

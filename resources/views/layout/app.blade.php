@@ -15,6 +15,7 @@
 
         @yield('body')
     </div>
+    <livewire:notifications.toast />
     @stack('scripts')
     @stack('modals')
 </body>

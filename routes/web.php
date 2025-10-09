@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\RemoteApi\TokenManager;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/login', fn() => view('login'))->name('login');
@@ -11,7 +12,8 @@ Route::middleware('api.auth')->group(function () {
     Route::get('/profiles', fn() => view('profiles'))->name('profiles');
 });
 
-Route::get('/logout', function () {
-    session()->forget(['api.jwt', 'api.jwt_expires_at']);
+Route::get('/logout', function (TokenManager $tokenManager) {
+    $tokenManager->clearToken();
+
     return redirect()->route('login');
 })->name('logout');

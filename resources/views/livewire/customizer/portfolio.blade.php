@@ -1,6 +1,14 @@
 <div class="card bg-base-100 mt-2 shadow-sm js-customizer-tab" id="portfolio">
     <div class="card-body">
-        <div class="card-title mb-4 text-gray-800">Portfolio Management System</div>
+        <div class="flex items-center card-title mb-4 text-gray-800">
+            <span>Portfolio Management System</span>
+            <span class="loading loading-spinner loading-xs" wire:loading></span>
+        </div>
+        @if($activeProfileId === null)
+            <div class="alert alert-info text-sm mb-3 flex items-start gap-2" role="alert">
+                <span>Select or create a profile to configure your portfolio management system.</span>
+            </div>
+        @endif
         <p>Set the % of your portfolio to allocate per trade depending on how much of your portfolio is already in use.</p>
     </div>
     <div class="overflow-x-auto px-2 md:px-6">
@@ -23,25 +31,21 @@
                             <td class="w-full basis-full font-semibold place-items-stretch">
                                 {{ $bucket['name'] }}
                             </td>
-                            @foreach($timeframes as $timeframe)
+                            @foreach($timeframes as $timeframeIndex => $timeframe)
                                 @if($timeframe['is_selectable'] !== 1) @continue @endif
-                                @php
-                                    $timeframeId = (int)$timeframe['id'];
-                                    $value = $sizingData[$bucket['id']][$timeframeId] ?? 0;
-                                    $value = $value * 100;
-                                    $formatted = rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.');
-                                @endphp
-                                <td class="flex items-center justify-end md:table-cell text-right md:text-center">
-                                    <label class="input input-sm w-20 pr-1 gap-0 text-right">
-                                        <input type="text"
+                                <td class="flex items-center justify-end md:table-cell text-right md:text-center" wire:key="bucket-{{ $bucket['id'] }}-timeframe-{{ $timeframe['id'] }}">
+                                    <label class="input input-sm w-20 pr-1 gap-0 text-right" aria-label="{{ $timeframe['label'] }} percent of equity">
+                                        <input type="number"
                                                 inputmode="decimal"
-                                                data-timeframe="{{ $timeframeId }}"
+                                                wire:model.lazy="sizingPercentages.{{ $bucket['id'] }}.{{ $timeframe['id'] }}"
+                                                data-timeframe="{{ (int) $timeframe['id'] }}"
                                                 data-bucket-id="{{ $bucket['id'] }}"
                                                 class="text-right js-number-input mr-1"
-                                                value="{{ $formatted }}"
                                                 step="0.01"
                                                 min="0"
-                                                max="100" />
+                                                max="100"
+                                                @disabled($activeProfileId === null || empty($buckets))
+                                        />
                                         <svg class="h-[1em]" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
                                     </label>
                                 </td>
@@ -56,9 +60,28 @@
     <div class="card-body sticky bottom-0 bg-base-100 md:static">
         <div class="flex flex-wrap items-center justify-between gap-2">
             <p class="pr-4 md:pr-0 text-xs md:text-sm">Example: enter 1.5 for 1.5% per order.</p>
-            <div class="flex items-center gap-2">
-                <button class="btn btn-ghost btn-sm js-reset-pms">Reset to default</button>
-                <button class="btn btn-primary js-save-pms">Save</button>
+            <div class="flex grow-1 items-center justify-end gap-2">
+                @if($hasUnsavedChanges)
+                    <span class="badge badge-soft badge-warning badge-xs">Unsaved changes</span>
+                @endif
+                <button class="btn btn-ghost btn-sm js-reset-pms"
+                        wire:click="resetToDefault"
+                        wire:target="resetToDefault"
+                        wire:loading.attr="disabled"
+                        @disabled($activeProfileId === null || empty($buckets))
+                >
+                    <span wire:loading.remove wire:target="resetToDefault">Reset to default</span>
+                    <span class="loading loading-spinner loading-xs" wire:loading wire:target="resetToDefault"></span>
+                </button>
+                <button class="btn btn-primary js-save-pms"
+                        wire:click="save"
+                        wire:target="save"
+                        wire:loading.attr="disabled"
+                        @disabled($activeProfileId === null || empty($buckets))
+                >
+                    <span wire:loading.remove wire:target="save">Save</span>
+                    <span class="loading loading-spinner loading-xs" wire:loading wire:target="save"></span>
+                </button>
             </div>
         </div>
     </div>
