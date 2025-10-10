@@ -1,0 +1,189 @@
+.pnl-cell {
+    text-align: left !important;
+}
+
+.table-positions th.wrap-header {
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+.table-positions .table thead,
+.table-positions .table tbody {
+    border-top: 1px solid var(--color-border) !important;
+}
+
+.table-positions .table tr.is-sub td {
+    padding: 8px;
+}
+
+.table-positions .table tr.is-sub td:first-child {
+    padding-left: 24px;
+}
+
+.table-positions .table tr.is-sub td:last-child {
+    padding-right: 24px;
+}
+
+.table-positions .table tr.is-sub td.hide-mobile {
+    display: none;
+}
+
+@media (min-width: 992px) {
+    .table-positions .table tr.is-sub td.hide-mobile {
+        display: table-cell;
+    }
+}
+
+.table-positions .table tr.is-sub + .is-sub td {
+    border-top-color: transparent !important;
+}
+
+.table-positions .table tr.is-sub:has(+ tr:not(.is-sub)) td {
+    padding-bottom: 16px;
+}
+
+.table-positions .table tr:not(.is-sub) + .is-sub td {
+    padding-top: 16px;
+}
+
+.table-positions .table th,
+.table-positions .table td {
+    padding: 19px 8px;
+}
+
+.table-positions .table th:first-child,
+.table-positions .table td:first-child {
+    padding-left: 24px;
+}
+
+.table-positions .table th:last-child,
+.table-positions .table td:last-child {
+    padding-right: 24px;
+}
+
+@media (min-width: 992px) {
+    .table-positions .table td:last-child {
+        text-align: right;
+    }
+}
+
+.table-positions .table th {
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+.table-positions .table td {
+    border-top: 1px solid var(--color-border) !important;
+}
+
+.table-positions .table td.id {
+    font-weight: 700;
+}
+
+.table-positions .table td.parent-id {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.table-positions .table td.nowrap {
+    white-space: nowrap;
+}
+
+.table-positions .table td.text-left {
+    text-align: left !important;
+}
+
+.table-positions .table td.text-right {
+    text-align: right !important;
+}
+
+.table-positions .table td .table-arrow {
+    cursor: pointer;
+}
+
+.table-positions .table td .table-arrow svg {
+    width: 24px;
+    height: 24px;
+    fill: #101010;
+    transition: transform 0.2s;
+}
+
+.table-positions .table td .table-arrow.is-toggled svg {
+    transform: rotate(-180deg);
+}
+
+.table-positions .dt-layout-row:not(.dt-layout-table) {
+    padding-right: 24px;
+    padding-left: 24px;
+}
+
+.table-positions div.dt-container div.dt-layout-end > *:not(:first-child) {
+    margin-left: 24px;
+}
+
+.table-positions .dt-length label {
+    margin-left: 4px;
+}
+
+.table-positions .dt-type-date {
+    text-align: left !important;
+}
+
+.table-positions .dtr-control {
+    text-align: right;
+}
+
+.table-positions .dtr-control::before {
+    transform: rotate(90deg);
+}
+
+.table-positions .dtr-expanded td.dtr-control::before {
+    border-left-color: transparent !important;
+    transform: rotate(180deg);
+}
+
+.table-positions .table.dataTable > tbody > tr.child ul.dtr-details {
+    display: block !important;
+}
+
+.table-positions table.dataTable > tbody > tr.child ul.dtr-details > li {
+    border-color: transparent !important;
+}
+
+.table-positions ul.dtr-details li.dca {
+    display: none;
+}
+
+.table-positions ul.dtr-details li.dca:has(.table-arrow) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.connected-title {
+    display: inline-flex;
+    align-items: center;
+}
+
+@media (min-width: 992px) {
+    .connected-title {
+        display: none;
+    }
+}
+
+.dca-title {
+    display: none;
+}
+
+@media (min-width: 992px) {
+    .dca-title {
+        display: inline-flex;
+        align-items: center;
+    }
+}
+
+.is-sub .mobile-timestamp,
+.is-sub .mobile-price {
+    transition: colspan 0.2s;
+}

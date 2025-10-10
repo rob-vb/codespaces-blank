@@ -11,6 +11,7 @@ Route::middleware('api.auth')->group(function () {
     Route::get('/no-beta-for-you-yet', fn() => view('no-beta'))->name('no-beta');
     Route::get('/profiles', fn() => view('profiles'))->name('profiles');
     Route::get('/settings', fn() => view('settings'))->name('settings');
+    Route::get('/trades', fn() => view('trades'))->name('trades');
 });
 
 Route::get('/logout', function (TokenManager $tokenManager) {

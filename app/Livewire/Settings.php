@@ -21,6 +21,13 @@ final class Settings extends Component
     public ?int $activeProfileId = null;
 
     /**
+     * @var array<string, mixed>|null
+     */
+    public ?array $activeProfile = null;
+
+    public bool $isPaperProfile = false;
+
+    /**
      * @var array<int, array<string, mixed>>
      */
     public array $definitions = [];
@@ -55,6 +62,7 @@ final class Settings extends Component
     public function mount(): void
     {
         $this->definitions = $this->getDefinitions();
+        $this->refreshActiveProfileMetadata();
         $this->loadPersistedCredentials();
     }
 
@@ -77,15 +85,25 @@ final class Settings extends Component
         $this->activeProfileId = $profileId;
         $this->resetErrorBag('api');
         $this->credentials = [];
+        $this->activeProfile = null;
+        $this->isPaperProfile = false;
         $this->persistedCredentials = null;
         $this->selectedExchangeKey = self::PLACEHOLDER_KEY;
         $this->selectedVariantId = null;
+        $this->refreshActiveProfileMetadata();
         $this->loadPersistedCredentials();
     }
 
     public function saveCredentials(): void
     {
         $this->resetErrorBag('api');
+
+        if ($this->isPaperProfile) {
+            $message = 'Paper trading profiles do not require exchange credentials.';
+            $this->dispatchToast($message, 'info');
+
+            return;
+        }
 
         if ($this->activeProfileId === null) {
             $message = 'Select a profile before saving credentials.';
@@ -243,6 +261,14 @@ final class Settings extends Component
     private function loadPersistedCredentials(): void
     {
         if ($this->activeProfileId === null) {
+            $this->persistedCredentials = null;
+            $this->selectedExchangeKey = self::PLACEHOLDER_KEY;
+            $this->selectedVariantId = null;
+
+            return;
+        }
+
+        if ($this->isPaperProfile) {
             $this->persistedCredentials = null;
             $this->selectedExchangeKey = self::PLACEHOLDER_KEY;
             $this->selectedVariantId = null;
@@ -461,6 +487,57 @@ final class Settings extends Component
     {
         return is_array($this->persistedCredentials)
             && isset($this->persistedCredentials['exchange'], $this->persistedCredentials['credentials']);
+    }
+
+    private function refreshActiveProfileMetadata(): void
+    {
+        $this->activeProfile = null;
+        $this->isPaperProfile = false;
+
+        if ($this->activeProfileId === null) {
+            return;
+        }
+
+        try {
+            $response = Http::remote()->get('/api/v2/profiles');
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return;
+        }
+
+        if ($response->failed()) {
+            report($response->toException());
+
+            return;
+        }
+
+        $profiles = $response->json('data');
+
+        if (! is_array($profiles)) {
+            return;
+        }
+
+        $activeProfileId = $this->activeProfileId;
+
+        $activeProfile = Collection::make($profiles)
+            ->first(static function (array $profile) use ($activeProfileId): bool {
+                if ($activeProfileId === null) {
+                    return false;
+                }
+
+                return (int) ($profile['id'] ?? 0) === $activeProfileId;
+            });
+
+        if (! is_array($activeProfile)) {
+            return;
+        }
+
+        $this->activeProfile = $activeProfile;
+
+        $tradeMode = strtolower((string) ($activeProfile['trade_mode'] ?? ''));
+
+        $this->isPaperProfile = $tradeMode === 'paper';
     }
 
     public function render(): View

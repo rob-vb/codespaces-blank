@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
                 ->asJson();
 
             $token = $tokenManager->getToken();
-
+            // dd($token);
             if ($token !== null) {
                 $client = $client->withToken($token);
             }

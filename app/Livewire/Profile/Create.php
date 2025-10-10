@@ -24,6 +24,10 @@ class Create extends Component
             'starting_balance' => $this->profileStartingBalance
         ];
 
+        if ($this->profileTradeMode === 'paper') {
+            $postData['exchange_id'] = 2;
+        }
+
         try {
             $response = Http::remote()->post('/api/v2/profile/create/', $postData);
         } catch (Throwable $exception) {

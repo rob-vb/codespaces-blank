@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Services\ActiveProfileManager;
 use App\Services\RemoteApi\TokenManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -23,9 +24,12 @@ class Login extends Component
 
     private TokenManager $tokenManager;
 
-    public function boot(TokenManager $tokenManager): void
+    private ActiveProfileManager $activeProfileManager;
+
+    public function boot(TokenManager $tokenManager, ActiveProfileManager $activeProfileManager): void
     {
         $this->tokenManager = $tokenManager;
+        $this->activeProfileManager = $activeProfileManager;
     }
 
     public function signIn(): Redirector|RedirectResponse|null
@@ -74,11 +78,59 @@ class Login extends Component
             user: is_array($user) ? $user : null,
         );
 
+        $this->activeProfileManager->clearActiveProfile();
+        $this->primeActiveProfile();
+
         return redirect()->route('customizer');
     }
 
     public function render()
     {
         return view('livewire.login');
+    }
+
+    private function primeActiveProfile(): void
+    {
+        try {
+            $response = Http::remote()->get('/api/v2/profiles');
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->activeProfileManager->clearActiveProfile();
+
+            return;
+        }
+
+        if ($response->failed()) {
+            report($response->toException());
+            $this->activeProfileManager->clearActiveProfile();
+
+            return;
+        }
+
+        $profiles = $response->json('data');
+
+        if (!is_iterable($profiles)) {
+            $this->activeProfileManager->clearActiveProfile();
+
+            return;
+        }
+
+        foreach ($profiles as $profile) {
+            if (!is_array($profile)) {
+                continue;
+            }
+
+            $profileId = (int) ($profile['id'] ?? 0);
+
+            if ($profileId <= 0) {
+                continue;
+            }
+
+            $this->activeProfileManager->setActiveProfileId($profileId);
+
+            return;
+        }
+
+        $this->activeProfileManager->clearActiveProfile();
     }
 }
